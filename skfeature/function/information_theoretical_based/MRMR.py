@@ -1,4 +1,5 @@
 from skfeature.function.information_theoretical_based import LCSI
+from sklearn.feature_selection.base import SelectorMixin
 import numpy as np
 
 def mrmr(X, y, **kwargs):
@@ -35,7 +36,7 @@ def mrmr(X, y, **kwargs):
         F, J_CMI, MIfy = LCSI.lcsi(X, y, gamma=0, function_name='MRMR')
     return F, J_CMI, MIfy
 
-class MRMR:
+class MRMR(SelectorMixin):
     def __init__(self,n_selected_features=None):
         if n_selected_features!=None:
             self.n_selected_features = n_selected_features
@@ -56,25 +57,13 @@ class MRMR:
         #and we change false -> True on positions which features were selected
         self.support_[support_]=True
 
-        print(support_)
-        print(support_.shape)
-
-
         #we set num of features
         self.n_features_ = self.support_.sum()
 
         return self
 
-    def transform(self,X):
-
-        #we check if we have fitted it
-        if not hasattr(self, "support_"):
-            print("Fit your selector first! All features were returned.")
-            return X
-
-        #we extract seleted features
-        return X[self.support_]
-
     def get_support(self):
+        return self.support_
 
+    def _get_support_mask(self):
         return self.support_
